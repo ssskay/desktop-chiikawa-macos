@@ -1,0 +1,170 @@
+[gd_scene load_steps=20 format=3 uid="uid://d1umtrjme47aa"]
+
+[ext_resource type="Script" uid="uid://5kqwl4k4x2wf" path="res://main.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://2ug4y2c1m8j8" path="res://-1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://c0xh4ys2227n" path="res://-2.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://culrukpf0fbdr" path="res://-3.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://d0mbr8qrleq14" path="res://goblin1.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://cdg5fbr0odm0l" path="res://goblin2.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://dwcvk4e61kwed" path="res://goblin3.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://c5gpnkg0bujdc" path="res://hachi1.png" id="8"]
+[ext_resource type="Texture2D" uid="uid://cjjw7hos0crb3" path="res://hachi2.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://chyfn25ix1d5k" path="res://hachi3.png" id="10"]
+[ext_resource type="Texture2D" uid="uid://boye5iweiinq6" path="res://momonga1.png" id="11"]
+[ext_resource type="Texture2D" uid="uid://d2e2ld080066t" path="res://momonga2.png" id="12"]
+[ext_resource type="Texture2D" uid="uid://bhrds78kfkynf" path="res://momonga3.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://da2jm3duxht7a" path="res://usagi1.png" id="14"]
+[ext_resource type="Texture2D" uid="uid://brky6oss7ca8b" path="res://usagi2.png" id="15"]
+[ext_resource type="Texture2D" uid="uid://bhjewrmks5ao8" path="res://usagi3.png" id="16"]
+[ext_resource type="FontFile" uid="uid://b2qfj5kwfav08" path="res://Inter_24pt-Black.ttf" id="17"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_5vw27"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4")
+}],
+"loop": true,
+"name": &"Chiikawa",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7")
+}],
+"loop": true,
+"name": &"Goblin",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10")
+}],
+"loop": true,
+"name": &"Hachiware",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13")
+}],
+"loop": true,
+"name": &"Momonga",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16")
+}],
+"loop": true,
+"name": &"Usagi",
+"speed": 5.0
+}]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(290, 150)
+scale = Vector2(0.322807, 0.322807)
+sprite_frames = SubResource("SpriteFrames_5vw27")
+animation = &"Momonga"
+
+[node name="reminder_timer" type="Timer" parent="AnimatedSprite2D"]
+autostart = true
+
+[node name="popup_hide_timer" type="Timer" parent="AnimatedSprite2D"]
+
+[node name="ChatBubble" type="Panel" parent="AnimatedSprite2D"]
+offset_left = -889.076
+offset_top = -415.109
+offset_right = 330.924
+offset_bottom = -238.109
+theme_override_styles/panel = SubResource("StyleBoxFlat_7mycd")
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="AnimatedSprite2D/ChatBubble"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 46.0
+offset_right = 1211.0
+offset_bottom = 165.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("17")
+theme_override_font_sizes/font_size = 60
+horizontal_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="RightClickMenu" type="PopupMenu" parent="."]
+
+[node name="LanguageMenu" type="PopupMenu" parent="RightClickMenu"]
+
+[node name="ChineseSubmenu" type="PopupMenu" parent="RightClickMenu/LanguageMenu"]
+
+[node name="SkinMenu" type="PopupMenu" parent="RightClickMenu"]
+
+[node name="ReminderMenu" type="PopupMenu" parent="RightClickMenu"]
+
+[node name="CustomReminderPopup" type="PopupPanel" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CustomReminderPopup"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 96.0
+offset_bottom = 96.0
+
+[node name="ReminderLabel" type="Label" parent="CustomReminderPopup/VBoxContainer"]
+layout_mode = 2
+text = "Enter custom time in minutes:"
+
+[node name="CustomReminderSpinbox" type="SpinBox" parent="CustomReminderPopup/VBoxContainer"]
+layout_mode = 2
+
+[node name="CustomReminderConfirmButton" type="Button" parent="CustomReminderPopup/VBoxContainer"]
+layout_mode = 2
+text = "Confirm"
+
+[connection signal="timeout" from="AnimatedSprite2D/reminder_timer" to="." method="_on_reminder_timer_timeout"]
+[connection signal="pressed" from="CustomReminderPopup/VBoxContainer/CustomReminderConfirmButton" to="." method="_on_custom_reminder_confirm_button_pressed"]

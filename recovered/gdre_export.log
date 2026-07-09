@@ -1,0 +1,36 @@
+GDRE Tools v2.6.0-beta.4
+macOS 15.1.0, headless
+Opening file: ~/chiikawa-desktop-pet/ChiikawaPet.app/Contents/Resources/ChiikawaPet.pck
+Loaded 19 imported files
+Detected Engine Version: 4.4.1
+Detected Bytecode Revision: 4.3.0-stable (77af6ca)
+Successfully loaded PCK!
+Version: 4.4.1
+Verified 42 files, no errors detected!
+Extracted 42 files, no errors detected!
+Saved project config.
+
+
+********************************EXPORT REPORT********************************
+
+Totals:                                 
+Decompiled scripts:                     1
+Scripts not decompiled:                 0
+Imported resources for export session:  19
+Successfully converted:                 19
+Lossy:                                  1
+Rewrote metadata:                       17
+Non-importable conversions:             0
+Not converted:                          0
+Failed conversions:                     0
+-------------
+
+
+
+------------------------------------------------------------------------------------
+
+Use Godot editor version 4.4.1 to edit the project.
+
+*******************************************************************************
+
+Recovery finished in 00m00s
