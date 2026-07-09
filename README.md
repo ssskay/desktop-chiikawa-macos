@@ -1,12 +1,22 @@
-# Desktop Chiikawa — macOS Port
+# Desktop Chiikawa for macOS 🍙 — Chiikawa Desktop Pet for Mac
 
-A native macOS port of [**Desktop Chiikawa**](https://cookieelmo.itch.io/desktop-chiikawa) by [**CookieElmo**](https://cookieelmo.itch.io), originally released for Windows in 2025.
+![Downloads](https://img.shields.io/github/downloads/ssskay/desktop-chiikawa-macos/total?label=downloads&color=ff69b4) ![Release](https://img.shields.io/github/v/release/ssskay/desktop-chiikawa-macos?label=latest&color=8fd3f4) ![Platform](https://img.shields.io/badge/platform-macOS%20(Apple%20Silicon%20%26%20Intel)-black)
+
+**A Chiikawa desktop pet that runs natively on Mac.** If you searched for *"chiikawa desktop pet macOS"* and only found Windows downloads — this is the Mac version. No Windows, no emulator, no Wine: a real macOS app for Apple Silicon (M1/M2/M3/M4) and Intel Macs.
+
+ちいかわのデスクトップペット、Mac版です 🐰 (macOS ネイティブアプリ・Apple Silicon対応)
+
+This is a native macOS port of [**Desktop Chiikawa**](https://cookieelmo.itch.io/desktop-chiikawa) by [**CookieElmo**](https://cookieelmo.itch.io), originally released for Windows in 2025.
 
 All credit for the original app — the concept, art integration, reminder system, skins, and multi-language support — belongs to CookieElmo, who made it free for the Chiikawa community. If you enjoy this, please visit the [original itch.io page](https://cookieelmo.itch.io/desktop-chiikawa) and consider supporting them (it's name-your-own-price!).
 
-## ⬇️ Download
+## ⬇️ Download (Mac)
 
-Grab `ChiikawaPet-macOS.zip` from the [Releases](../../releases) page. Unzip, then right-click `ChiikawaPet.app` → Open (first launch only, since the app is not notarized). Works on Apple Silicon and Intel Macs.
+Grab **`ChiikawaPet.dmg`** from the [Releases](../../releases) page, open it, and drag ChiikawaPet to Applications. On first launch, right-click the app → Open (it's a free fan project, not notarized with Apple). Works on Apple Silicon and Intel Macs — macOS 10.13+.
+
+## 🪟 On Windows?
+
+You want the original! Download it straight from CookieElmo: [Desktop Chiikawa on itch.io](https://cookieelmo.itch.io/desktop-chiikawa).
 
 ## ✨ What it does
 
