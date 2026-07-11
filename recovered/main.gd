@@ -534,6 +534,7 @@ func _input(event):
 		var mouse_global = Vector2(DisplayServer.mouse_get_position())
 		var new_window_pos = mouse_global - drag_offset
 		DisplayServer.window_set_position(Vector2i(new_window_pos))
+		window_pos_f = new_window_pos
 
 func _on_skin_selected(id: int):
 	match id:
