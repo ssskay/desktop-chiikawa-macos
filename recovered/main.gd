@@ -18,7 +18,6 @@ const SIZE_PRESETS := [0.75, 1.0, 1.5, 2.0, 3.0]
 @onready var skin_menu = $RightClickMenu / SkinMenu
 @onready var reminder_menu = $RightClickMenu / ReminderMenu
 @onready var size_menu = $RightClickMenu / SizeMenu
-@onready var chinese_submenu = $RightClickMenu / LanguageMenu / ChineseSubmenu
 
 @onready var custom_reminder_popup = $CustomReminderPopup
 @onready var custom_reminder_spinbox = $CustomReminderPopup / VBoxContainer / CustomReminderSpinbox
@@ -257,22 +256,12 @@ func _init_menus():
 	language_menu.clear()
 	skin_menu.clear()
 	right_click_menu.clear()
-	chinese_submenu.clear()
 
 
 	language_menu.add_item("English", 0)
 	language_menu.add_item("日本語", 1)
 	if not language_menu.id_pressed.is_connected(_on_language_selected):
 		language_menu.id_pressed.connect(_on_language_selected)
-
-
-	chinese_submenu.add_item("廣東話", 0)
-	chinese_submenu.add_item("中文（简体）", 1)
-	chinese_submenu.add_item("中文（繁體）", 2)
-	if not chinese_submenu.id_pressed.is_connected(_on_chinese_language_selected):
-		chinese_submenu.id_pressed.connect(_on_chinese_language_selected)
-
-	language_menu.add_submenu_item("中文", "ChineseSubmenu")
 
 	right_click_menu.clear()
 
@@ -371,25 +360,6 @@ func _on_language_selected(id: int) -> void :
 			current_language = "en"
 		1:
 			current_language = "jp"
-		2:
-			current_language = "yue"
-		3:
-			current_language = "zh_cn"
-		4:
-			current_language = "zh_tw"
-
-	_init_menus()
-	_save_state()
-
-
-func _on_chinese_language_selected(id: int) -> void :
-	match id:
-		0:
-			current_language = "yue"
-		1:
-			current_language = "zh_cn"
-		2:
-			current_language = "zh_tw"
 
 	_init_menus()
 	_save_state()

@@ -141,8 +141,6 @@ metadata/_edit_use_anchors_ = true
 
 [node name="LanguageMenu" type="PopupMenu" parent="RightClickMenu"]
 
-[node name="ChineseSubmenu" type="PopupMenu" parent="RightClickMenu/LanguageMenu"]
-
 [node name="SkinMenu" type="PopupMenu" parent="RightClickMenu"]
 
 [node name="ReminderMenu" type="PopupMenu" parent="RightClickMenu"]
