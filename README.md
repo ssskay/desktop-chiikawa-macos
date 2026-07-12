@@ -12,7 +12,12 @@ All credit for the original app — the concept, art integration, reminder syste
 
 ## ⬇️ Download (Mac)
 
-Grab **`ChiikawaPet.dmg`** from the [Releases](../../releases) page, open it, and drag ChiikawaPet to Applications. On first launch, right-click the app → Open (it's a free fan project, not notarized with Apple). Works on Apple Silicon and Intel Macs — macOS 10.13+.
+Two builds — grab the one for your Mac:
+
+- **Apple Silicon (M1/M2/M3/M4):** [ChiikawaPet-AppleSilicon.dmg](https://github.com/ssskay/desktop-chiikawa-macos/releases/latest/download/ChiikawaPet-AppleSilicon.dmg)
+- **Intel Macs:** [ChiikawaPet-Intel.dmg](https://github.com/ssskay/desktop-chiikawa-macos/releases/latest/download/ChiikawaPet-Intel.dmg)
+
+Not sure which? Apple menu → About This Mac — an "Apple M-series" chip means Apple Silicon; "Intel" means Intel. Open the DMG and drag ChiikawaPet to Applications. The app is **signed and notarized by Apple**, so just double-click to open — no right-click needed. macOS 10.13+.
 
 ## 🪟 On Windows?
 
@@ -20,18 +25,21 @@ You want the original! Download it straight from CookieElmo: [Desktop Chiikawa o
 
 ## ✨ What it does
 
-Your Chiikawa friend wanders your desktop, delivers gentle health reminders (hydrate! stretch!), and chats in kaomoji speech bubbles. Right-click the pet for the menu:
+Your Chiikawa friend wanders your desktop, delivers gentle wellness reminders (hydrate! stretch!), and chats in kaomoji speech bubbles. Reach the menu three ways — right-click the pet, the **menu-bar tray icon** (top-right), or the **app menu bar** (top-left):
 
 - **Skins**: Chiikawa, Hachiware, Usagi, Goblin, Momonga — each speaks with their real catchphrases (Ura! Yaha!)
-- **Languages**: English, 日本語, 廣東話, 简体中文, 繁體中文
-- **Reminders**: configurable interval wellness nudges
+- **Size**: Small → **Giant** — make your pet as big as you like
+- **Languages**: English, 日本語
+- **Reminders**: wellness + productivity nudges at a configurable interval — or set your **own custom reminder message**
 - **Give Snack** 🍙 and petting (quick click) reactions
 - **Wander around** toggle — let them roam or stay put
 
 ## 🔧 Changes in this port (vs. the original Windows version)
 
-- Runs natively on macOS via the official Godot 4.4.1 runtime (no emulation)
-- Remembers position, skin, language, and reminder settings between launches
+- Runs natively on macOS via the official Godot 4.4.1 runtime (no emulation), signed + notarized, with separate Apple Silicon and Intel builds
+- Adjustable pet size (up to Giant), plus a native menu-bar tray icon and app menu bar — not just right-click
+- Custom reminder messages on top of a bigger wellness + productivity nudge pool
+- Remembers position, skin, language, size, and reminder settings between launches
 - Autonomous wandering with a menu toggle
 - Petting and snack interactions with per-character voices
 - Time-aware greetings, kaomoji instead of emoji
@@ -42,6 +50,8 @@ Your Chiikawa friend wanders your desktop, delivers gentle health reminders (hyd
 The `recovered/` folder contains the Godot 4.4.1 project. Open it in the Godot editor (or use the bundled `export_presets.cfg`) and export for macOS.
 
 **A clean export is not byte-identical to the currently shipped pck — and that's expected.** A normal Godot export compiles the GDScript to bytecode (`main.gdc`), whereas the shipped pck carries plain-source `main.gd` (it was post-processed with `tools/repack_pck.py`). The two are **functionally equivalent**; the clean export is actually the cleaner artifact. `repack_pck.py` is only needed if you want a bit-for-bit reproduction of the older pck — which normal builds do not require.
+
+To reproduce the release exactly, `scripts/release.sh` exports the universal build, `lipo`-thins it to Apple Silicon and Intel, and signs + notarizes + staples each into its own DMG. It needs a *Developer ID Application* certificate and a `notarytool` keychain profile; run `scripts/release.sh --dry-run` to build and sign locally without contacting Apple.
 
 ## ⚠️ Disclaimer
 
