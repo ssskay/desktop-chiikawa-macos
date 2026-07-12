@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Chiikawa Pet is a self-contained Godot 4.4 app: no JIT, no unsigned
+	  executable memory, no GDExtension, no App Sandbox. Hardened runtime with
+	  ZERO exceptions is the most-restrictive correct entitlement set and
+	  notarizes cleanly. Add a specific key here ONLY if a launch or
+	  notarization failure proves one is required.
+	-->
+</dict>
+</plist>
