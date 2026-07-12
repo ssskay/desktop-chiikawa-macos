@@ -39,7 +39,9 @@ Your Chiikawa friend wanders your desktop, delivers gentle health reminders (hyd
 
 ## 🛠 Building from source
 
-The `recovered/` folder contains the Godot 4.4.1 project. Open it in the Godot editor and export for macOS, or repack the modified script into an existing pck using `tools/repack_pck.py`.
+The `recovered/` folder contains the Godot 4.4.1 project. Open it in the Godot editor (or use the bundled `export_presets.cfg`) and export for macOS.
+
+**A clean export is not byte-identical to the currently shipped pck — and that's expected.** A normal Godot export compiles the GDScript to bytecode (`main.gdc`), whereas the shipped pck carries plain-source `main.gd` (it was post-processed with `tools/repack_pck.py`). The two are **functionally equivalent**; the clean export is actually the cleaner artifact. `repack_pck.py` is only needed if you want a bit-for-bit reproduction of the older pck — which normal builds do not require.
 
 ## ⚠️ Disclaimer
 

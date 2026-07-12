@@ -2,3 +2,6 @@
 _build/
 ChiikawaPet.app/
 *.zip
+
+# Godot editor cache & import artifacts — regenerated on open/export, never committed
+.godot/
