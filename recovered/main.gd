@@ -4,6 +4,8 @@ const SAVE_PATH := "user://pet_state.cfg"
 const WANDER_SPEED := 40.0
 const MENU_ID_SNACK := 10
 const MENU_ID_WANDER := 11
+const BASE_WINDOW := Vector2i(400, 250)
+const SIZE_PRESETS := [0.75, 1.0, 1.5, 2.0, 3.0]
 
 @onready var sprite = $AnimatedSprite2D
 @onready var chat_bubble = $AnimatedSprite2D / ChatBubble
@@ -15,6 +17,7 @@ const MENU_ID_WANDER := 11
 @onready var language_menu = $RightClickMenu / LanguageMenu
 @onready var skin_menu = $RightClickMenu / SkinMenu
 @onready var reminder_menu = $RightClickMenu / ReminderMenu
+@onready var size_menu = $RightClickMenu / SizeMenu
 @onready var chinese_submenu = $RightClickMenu / LanguageMenu / ChineseSubmenu
 
 @onready var custom_reminder_popup = $CustomReminderPopup
@@ -36,6 +39,15 @@ var wander_dir: = Vector2.RIGHT
 var wander_time_left: = 0.0
 var window_pos_f: = Vector2.ZERO
 var base_scale: = Vector2.ONE
+var base_sprite_pos: = Vector2.ZERO
+var size_mult: = 1.0
+var size_names: = {
+	"en": ["Small", "Normal", "Large", "Huge", "Giant"],
+	"jp": ["小", "普通", "大", "特大", "巨大"],
+	"yue": ["細", "正常", "大", "超大", "巨型"],
+	"zh_cn": ["小", "正常", "大", "超大", "巨大"],
+	"zh_tw": ["小", "正常", "大", "超大", "巨大"],
+}
 
 var messages: = {
 	"en": {
@@ -154,6 +166,7 @@ func _ready():
 	get_viewport().transparent_bg = true
 	chat_bubble.hide()
 	base_scale = sprite.scale
+	base_sprite_pos = sprite.position
 
 	reminder_timer.wait_time = 900
 	_load_state()
@@ -187,6 +200,7 @@ func _save_state():
 	cfg.set_value("pet", "lang", current_language)
 	cfg.set_value("pet", "reminder_sec", reminder_timer.wait_time)
 	cfg.set_value("pet", "wander", wander_enabled)
+	cfg.set_value("pet", "size_mult", size_mult)
 	var err = cfg.save(SAVE_PATH)
 	if err != OK:
 		print("ChiikawaPet: failed to save state, error ", err)
@@ -201,6 +215,7 @@ func _load_state():
 	current_language = cfg.get_value("pet", "lang", current_language)
 	wander_enabled = cfg.get_value("pet", "wander", true)
 	reminder_timer.wait_time = cfg.get_value("pet", "reminder_sec", 900)
+	_apply_size(cfg.get_value("pet", "size_mult", 1.0), false)
 	var px = cfg.get_value("pet", "pos_x", null)
 	var py = cfg.get_value("pet", "pos_y", null)
 	if px != null and py != null:
@@ -282,6 +297,10 @@ func _init_menus():
 		"皮膚" if current_language in ["jp", "yue", "zh_cn", "zh_tw"] else "Skin",
 		"SkinMenu"
 	)
+	right_click_menu.add_submenu_item(
+		{"jp": "サイズ", "yue": "大細", "zh_cn": "大小", "zh_tw": "大小"}.get(current_language, "Size"),
+		"SizeMenu"
+	)
 	right_click_menu.add_submenu_item(reminder_label, "ReminderMenu")
 
 	right_click_menu.add_separator()
@@ -299,6 +318,15 @@ func _init_menus():
 	skin_menu.add_item("Momonga", 4)
 	if not skin_menu.id_pressed.is_connected(_on_skin_selected):
 		skin_menu.id_pressed.connect(_on_skin_selected)
+
+
+	size_menu.clear()
+	var s_names = size_names.get(current_language, size_names["en"])
+	for i in SIZE_PRESETS.size():
+		size_menu.add_radio_check_item(s_names[i], i)
+		size_menu.set_item_checked(i, is_equal_approx(SIZE_PRESETS[i], size_mult))
+	if not size_menu.id_pressed.is_connected(_on_size_selected):
+		size_menu.id_pressed.connect(_on_size_selected)
 
 
 	reminder_menu.clear()
@@ -380,6 +408,27 @@ func _on_main_menu_id_pressed(id: int) -> void :
 			_save_state()
 
 
+func _on_size_selected(id: int) -> void :
+	_apply_size(SIZE_PRESETS[id], true)
+	for i in size_menu.item_count:
+		size_menu.set_item_checked(i, i == id)
+	_save_state()
+
+
+func _apply_size(mult: float, recenter: bool) -> void :
+	size_mult = mult
+	sprite.scale = base_scale * mult
+	sprite.position = base_sprite_pos * mult
+	var new_size = Vector2i(roundi(BASE_WINDOW.x * mult), roundi(BASE_WINDOW.y * mult))
+	if recenter:
+		var c = DisplayServer.window_get_position() + DisplayServer.window_get_size() / 2
+		DisplayServer.window_set_size(new_size)
+		DisplayServer.window_set_position(c - new_size / 2)
+	else:
+		DisplayServer.window_set_size(new_size)
+	_update_passthrough()
+
+
 func _on_snack():
 	show_message(_voice_pool("snack").pick_random())
 	_bounce()
@@ -392,8 +441,9 @@ func _on_petted():
 
 func _bounce():
 	var tw = create_tween()
-	tw.tween_property(sprite, "scale", base_scale * 1.15, 0.1)
-	tw.tween_property(sprite, "scale", base_scale, 0.15)
+	var s = base_scale * size_mult
+	tw.tween_property(sprite, "scale", s * 1.15, 0.1)
+	tw.tween_property(sprite, "scale", s, 0.15)
 
 
 func _show_greeting():
