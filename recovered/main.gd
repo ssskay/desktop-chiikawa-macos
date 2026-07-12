@@ -23,6 +23,10 @@ const SIZE_PRESETS := [0.75, 1.0, 1.5, 2.0, 3.0]
 @onready var custom_reminder_spinbox = $CustomReminderPopup / VBoxContainer / CustomReminderSpinbox
 @onready var custom_reminder_label = $CustomReminderPopup / VBoxContainer / ReminderLabel
 
+@onready var custom_message_popup = $CustomMessagePopup
+@onready var custom_message_edit = $CustomMessagePopup / VBoxContainer / CustomMessageEdit
+@onready var custom_message_button = $CustomMessagePopup / VBoxContainer / CustomMessageConfirmButton
+
 var dragging: = false
 var drag_offset: = Vector2.ZERO
 var drag_dist: = 0.0
@@ -31,6 +35,7 @@ var pressed_on_sprite: = false
 
 var current_language = "en"
 var current_skin = "Chiikawa"
+var custom_reminder_msg = ""
 
 var wander_enabled: = true
 var wander_state: = "idle"
@@ -47,17 +52,42 @@ var size_names: = {
 	"zh_cn": ["小", "正常", "大", "超大", "巨大"],
 	"zh_tw": ["小", "正常", "大", "超大", "巨大"],
 }
+var _menubar_base: = -1
+var _native_rids: Array[RID] = []
+var _status_id: = -1
 
 var messages: = {
 	"en": {
-		"health": ["(ノ´ヮ`)ノ Time to stretch!", "( ˘▽˘)っ旦~ Water time!", "(¬‿¬) Blink your eyes!"],
+		"health": [
+			"(ノ´ヮ`)ノ Time to stretch!",
+			"( ˘▽˘)っ旦~ Water time! Hydrate~",
+			"(¬‿¬) Blink your eyes! Rest them~",
+			"(￣▽￣)ﾉ Roll your shoulders back~",
+			"(｡•́‿•̀｡) Posture check — sit up tall~",
+			"(づ｡◕‿‿◕｡)づ Look far away for 20 seconds~",
+			"ヽ(´▽`)ノ Stand up and move a little!",
+			"( ˶ˆ ᗜ ˆ˵ ) Unclench your jaw, deep breath~",
+			"(っ˘ω˘ς ) One task done? Take a mini break~",
+			"(ᐢ⑅•ᴗ•⑅ᐢ) Wiggle your fingers, relax your hands~"
+		],
 		"night": ["(´-ω-)｡ﾟzzZ It's late... I'm sleepy...", "(ᴗ˳ᴗ) Shouldn't you be in bed?"],
 		"greet_m": ["ヽ(´▽`)ノ Good morning! Let's have a great day!"],
 		"greet_a": ["(￣▽￣)ノ Good afternoon~ Keep it up!"],
 		"greet_e": ["(´｡• ᵕ •｡`) Good evening! Time to wind down~"]
 	},
 	"jp": {
-		"health": ["(ノ´ヮ`)ノ ストレッチしよう！", "( ˘▽˘)っ旦~ 水を飲んでね！", "(¬‿¬) 目を休めて〜"],
+		"health": [
+			"(ノ´ヮ`)ノ ストレッチしよう！",
+			"( ˘▽˘)っ旦~ お水飲んでね〜",
+			"(¬‿¬) 目を休めて〜",
+			"(￣▽￣)ﾉ 肩を回してみよう〜",
+			"(｡•́‿•̀｡) 姿勢を正して、背筋ピン！",
+			"(づ｡◕‿‿◕｡)づ 20秒だけ遠くを見て〜",
+			"ヽ(´▽`)ノ 立ち上がって少し動こう！",
+			"( ˶ˆ ᗜ ˆ˵ ) 顎の力を抜いて、深呼吸〜",
+			"(っ˘ω˘ς ) ひと仕事おわった？少し休憩〜",
+			"(ᐢ⑅•ᴗ•⑅ᐢ) 手をぶらぶら、リラックス〜"
+		],
 		"night": ["(´-ω-)｡ﾟzzZ もう遅いよ…ねむい…", "(ᴗ˳ᴗ) そろそろ寝ようよ〜"],
 		"greet_m": ["ヽ(´▽`)ノ おはよう！今日もがんばろう！"],
 		"greet_a": ["(￣▽￣)ノ こんにちは〜 その調子！"],
@@ -177,6 +207,9 @@ func _ready():
 	popup_hide_timer.wait_time = 3
 	popup_hide_timer.timeout.connect(_hide_popup)
 
+	custom_message_button.pressed.connect(_on_custom_message_confirm)
+	custom_message_edit.text_submitted.connect(_on_custom_message_confirm)
+
 	_init_menus()
 
 	wander_time_left = randf_range(2.0, 5.0)
@@ -200,6 +233,7 @@ func _save_state():
 	cfg.set_value("pet", "reminder_sec", reminder_timer.wait_time)
 	cfg.set_value("pet", "wander", wander_enabled)
 	cfg.set_value("pet", "size_mult", size_mult)
+	cfg.set_value("pet", "custom_msg", custom_reminder_msg)
 	var err = cfg.save(SAVE_PATH)
 	if err != OK:
 		print("ChiikawaPet: failed to save state, error ", err)
@@ -213,6 +247,7 @@ func _load_state():
 	current_skin = cfg.get_value("pet", "skin", current_skin)
 	current_language = cfg.get_value("pet", "lang", current_language)
 	wander_enabled = cfg.get_value("pet", "wander", true)
+	custom_reminder_msg = cfg.get_value("pet", "custom_msg", "")
 	reminder_timer.wait_time = cfg.get_value("pet", "reminder_sec", 900)
 	_apply_size(cfg.get_value("pet", "size_mult", 1.0), false)
 	var px = cfg.get_value("pet", "pos_x", null)
@@ -325,7 +360,7 @@ func _init_menus():
 	match current_language:
 		"jp":
 			min_label = "分"
-			custom_label = "カスタム..."
+			custom_label = "カスタム時間..."
 		"yue":
 			min_label = "分鐘"
 			custom_label = "自定義..."
@@ -337,7 +372,7 @@ func _init_menus():
 			custom_label = "自訂..."
 		_:
 			min_label = "min"
-			custom_label = "Custom..."
+			custom_label = "Custom time..."
 
 	reminder_menu.add_item("5 %s" % min_label)
 	reminder_menu.set_item_metadata(0, 5)
@@ -348,9 +383,20 @@ func _init_menus():
 	reminder_menu.add_separator()
 	reminder_menu.add_item(custom_label)
 	reminder_menu.set_item_metadata(4, -1)
+	reminder_menu.add_separator()
+	var msg_label = "カスタムメッセージ..." if current_language == "jp" else "Custom message..."
+	var default_label = "デフォルトに戻す" if current_language == "jp" else "Default reminders"
+	reminder_menu.add_item(msg_label)
+	reminder_menu.set_item_metadata(6, -2)
+	reminder_menu.add_item(default_label)
+	reminder_menu.set_item_metadata(7, -3)
+	$CustomMessagePopup / VBoxContainer / MessageLabel.text = "何をリマインドする？" if current_language == "jp" else "What should I remind you?"
+	custom_message_button.text = "保存" if current_language == "jp" else "Save"
 
 	if not reminder_menu.id_pressed.is_connected(_on_ReminderMenu_id_pressed):
 		reminder_menu.id_pressed.connect(_on_ReminderMenu_id_pressed)
+
+	_build_native_menus()
 
 
 
@@ -370,12 +416,7 @@ func _on_main_menu_id_pressed(id: int) -> void :
 		MENU_ID_SNACK:
 			_on_snack()
 		MENU_ID_WANDER:
-			wander_enabled = not wander_enabled
-			right_click_menu.set_item_checked(right_click_menu.get_item_index(MENU_ID_WANDER), wander_enabled)
-			if wander_enabled:
-				wander_state = "idle"
-				wander_time_left = randf_range(1.0, 3.0)
-			_save_state()
+			_toggle_wander()
 
 
 func _on_size_selected(id: int) -> void :
@@ -383,6 +424,7 @@ func _on_size_selected(id: int) -> void :
 	for i in size_menu.item_count:
 		size_menu.set_item_checked(i, i == id)
 	_save_state()
+	_build_native_menus()
 
 
 func _apply_size(mult: float, recenter: bool) -> void :
@@ -429,6 +471,9 @@ func _show_greeting():
 
 
 func _on_reminder():
+	if custom_reminder_msg != "":
+		show_message(custom_reminder_msg)
+		return
 	var h = Time.get_time_dict_from_system().hour
 	if (h >= 23 or h < 5) and randf() < 0.5:
 		show_message(messages[current_language]["night"].pick_random())
@@ -573,6 +618,7 @@ func _set_skin(skin_name: String):
 	current_skin = skin_name
 	sprite.play(skin_name)
 	_save_state()
+	_build_native_menus()
 
 
 func _on_reminder_timer_timeout() -> void :
@@ -581,13 +627,32 @@ func _on_reminder_timer_timeout() -> void :
 func _on_ReminderMenu_id_pressed(id: int) -> void :
 	var value = reminder_menu.get_item_metadata(id)
 	if value == -1:
-
 		custom_reminder_popup.popup_centered()
+	elif value == -2:
+		_open_custom_message()
+	elif value == -3:
+		_clear_custom_message()
 	else:
-
 		reminder_timer.wait_time = value * 60
 		reminder_timer.start()
 		_save_state()
+
+
+func _open_custom_message() -> void :
+	custom_message_edit.text = custom_reminder_msg
+	custom_message_popup.popup_centered(Vector2i(320, 120))
+	custom_message_edit.grab_focus()
+
+
+func _clear_custom_message() -> void :
+	custom_reminder_msg = ""
+	_save_state()
+
+
+func _on_custom_message_confirm(_submitted: String = "") -> void :
+	custom_reminder_msg = custom_message_edit.text.strip_edges()
+	custom_message_popup.hide()
+	_save_state()
 
 func _on_custom_reminder_confirm_button_pressed() -> void :
 	var minutes = custom_reminder_spinbox.value
@@ -596,3 +661,156 @@ func _on_custom_reminder_confirm_button_pressed() -> void :
 		reminder_timer.start()
 		custom_reminder_popup.hide()
 		_save_state()
+
+
+# ---------------------------------------------------------------------------
+# Native macOS menus: the top-left app menu bar and an always-visible menu-bar
+# tray icon, both mirroring the right-click commands. Rebuilt from current
+# state whenever a setting changes. No-op on platforms without a system menu.
+# ---------------------------------------------------------------------------
+func _tr_menu(key: String) -> String :
+	var jp = {
+		"skin": "皮膚", "size": "サイズ", "language": "言語",
+		"reminder": "リマインダー設定", "actions": "操作",
+		"min": "分", "custom": "カスタム時間...", "quit": "終了",
+		"custom_msg": "カスタムメッセージ...", "default_rem": "デフォルトに戻す",
+	}
+	var en = {
+		"skin": "Skin", "size": "Size", "language": "Language",
+		"reminder": "Set Reminder", "actions": "Actions",
+		"min": "min", "custom": "Custom time...", "quit": "Quit",
+		"custom_msg": "Custom message...", "default_rem": "Default reminders",
+	}
+	return jp[key] if current_language == "jp" else en[key]
+
+
+func _nm_menu_skin() -> RID :
+	var m = NativeMenu.create_menu()
+	_native_rids.append(m)
+	var skins = ["Chiikawa", "Hachiware", "Usagi", "Goblin", "Momonga"]
+	for i in skins.size():
+		var idx = NativeMenu.add_radio_check_item(m, skins[i], _nm_skin, Callable(), i)
+		NativeMenu.set_item_checked(m, idx, skins[i] == current_skin)
+	return m
+
+
+func _nm_menu_size() -> RID :
+	var m = NativeMenu.create_menu()
+	_native_rids.append(m)
+	var names = size_names.get(current_language, size_names["en"])
+	for i in SIZE_PRESETS.size():
+		var idx = NativeMenu.add_radio_check_item(m, names[i], _nm_size, Callable(), i)
+		NativeMenu.set_item_checked(m, idx, is_equal_approx(SIZE_PRESETS[i], size_mult))
+	return m
+
+
+func _nm_menu_lang() -> RID :
+	var m = NativeMenu.create_menu()
+	_native_rids.append(m)
+	var a = NativeMenu.add_radio_check_item(m, "English", _nm_lang, Callable(), 0)
+	NativeMenu.set_item_checked(m, a, current_language == "en")
+	var b = NativeMenu.add_radio_check_item(m, "日本語", _nm_lang, Callable(), 1)
+	NativeMenu.set_item_checked(m, b, current_language == "jp")
+	return m
+
+
+func _nm_menu_reminder() -> RID :
+	var m = NativeMenu.create_menu()
+	_native_rids.append(m)
+	var unit = _tr_menu("min")
+	NativeMenu.add_item(m, "5 %s" % unit, _nm_reminder, Callable(), 5)
+	NativeMenu.add_item(m, "10 %s" % unit, _nm_reminder, Callable(), 10)
+	NativeMenu.add_item(m, "30 %s" % unit, _nm_reminder, Callable(), 30)
+	NativeMenu.add_separator(m)
+	NativeMenu.add_item(m, _tr_menu("custom"), _nm_reminder, Callable(), -1)
+	NativeMenu.add_item(m, _tr_menu("custom_msg"), _nm_reminder, Callable(), -2)
+	NativeMenu.add_item(m, _tr_menu("default_rem"), _nm_reminder, Callable(), -3)
+	return m
+
+
+func _nm_menu_actions() -> RID :
+	var m = NativeMenu.create_menu()
+	_native_rids.append(m)
+	NativeMenu.add_item(m, _ui_label("snack"), _nm_snack, Callable(), 0)
+	var w = NativeMenu.add_check_item(m, _ui_label("wander"), _nm_wander, Callable(), 0)
+	NativeMenu.set_item_checked(m, w, wander_enabled)
+	return m
+
+
+func _build_native_menus() -> void :
+	if not NativeMenu.has_system_menu(NativeMenu.MAIN_MENU_ID):
+		return
+	var main = NativeMenu.get_system_menu(NativeMenu.MAIN_MENU_ID)
+	if _menubar_base < 0:
+		_menubar_base = NativeMenu.get_item_count(main)
+	# tear down the top-level menus we added last time, then free old submenus
+	while NativeMenu.get_item_count(main) > _menubar_base:
+		NativeMenu.remove_item(main, NativeMenu.get_item_count(main) - 1)
+	for r in _native_rids:
+		if NativeMenu.has_menu(r):
+			NativeMenu.free_menu(r)
+	_native_rids.clear()
+
+	# top-left app menu bar
+	NativeMenu.add_submenu_item(main, _tr_menu("skin"), _nm_menu_skin())
+	NativeMenu.add_submenu_item(main, _tr_menu("size"), _nm_menu_size())
+	NativeMenu.add_submenu_item(main, _tr_menu("language"), _nm_menu_lang())
+	NativeMenu.add_submenu_item(main, _tr_menu("reminder"), _nm_menu_reminder())
+	NativeMenu.add_submenu_item(main, _tr_menu("actions"), _nm_menu_actions())
+
+	# always-visible menu-bar tray icon: same commands in one dropdown
+	var root = NativeMenu.create_menu()
+	_native_rids.append(root)
+	NativeMenu.add_submenu_item(root, _tr_menu("skin"), _nm_menu_skin())
+	NativeMenu.add_submenu_item(root, _tr_menu("size"), _nm_menu_size())
+	NativeMenu.add_submenu_item(root, _tr_menu("language"), _nm_menu_lang())
+	NativeMenu.add_submenu_item(root, _tr_menu("reminder"), _nm_menu_reminder())
+	NativeMenu.add_separator(root)
+	NativeMenu.add_item(root, _ui_label("snack"), _nm_snack, Callable(), 0)
+	var w = NativeMenu.add_check_item(root, _ui_label("wander"), _nm_wander, Callable(), 0)
+	NativeMenu.set_item_checked(root, w, wander_enabled)
+	NativeMenu.add_separator(root)
+	NativeMenu.add_item(root, _tr_menu("quit"), _nm_quit, Callable(), 0)
+
+	if _status_id == -1:
+		_status_id = DisplayServer.create_status_indicator(load("res://icon.png"), "Chiikawa Pet", Callable())
+	DisplayServer.status_indicator_set_menu(_status_id, root)
+
+
+# Native callbacks receive the item tag. Defer the action so we never rebuild a
+# menu from inside its own activation callback.
+func _nm_skin(tag): _on_skin_selected.call_deferred(int(tag))
+func _nm_size(tag): _on_size_selected.call_deferred(int(tag))
+func _nm_lang(tag): _on_language_selected.call_deferred(int(tag))
+func _nm_reminder(tag): _nm_set_reminder.call_deferred(int(tag))
+func _nm_snack(_tag): _on_snack.call_deferred()
+func _nm_wander(_tag): _toggle_wander.call_deferred()
+func _nm_quit(_tag): _quit.call_deferred()
+
+
+func _nm_set_reminder(mins: int) -> void :
+	if mins == -1:
+		custom_reminder_popup.popup_centered()
+	elif mins == -2:
+		_open_custom_message()
+	elif mins == -3:
+		_clear_custom_message()
+	else:
+		reminder_timer.wait_time = mins * 60
+		reminder_timer.start()
+		_save_state()
+
+
+func _toggle_wander() -> void :
+	wander_enabled = not wander_enabled
+	right_click_menu.set_item_checked(right_click_menu.get_item_index(MENU_ID_WANDER), wander_enabled)
+	if wander_enabled:
+		wander_state = "idle"
+		wander_time_left = randf_range(1.0, 3.0)
+	_save_state()
+	_build_native_menus()
+
+
+func _quit() -> void :
+	_save_state()
+	get_tree().quit()
