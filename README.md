@@ -2,6 +2,9 @@
 
 ![Downloads](https://img.shields.io/github/downloads/ssskay/desktop-chiikawa-macos/total?label=downloads&color=ff69b4) ![Release](https://img.shields.io/github/v/release/ssskay/desktop-chiikawa-macos?label=latest&color=8fd3f4) ![Platform](https://img.shields.io/badge/platform-macOS%20(Apple%20Silicon%20%26%20Intel)-black)
 
+<!-- sarakay.me/downloads -->
+**[⬇ Download for Mac (Apple Silicon)](https://sarakay.me/get/chiikawa-pet/mac-arm64)** · **[⬇ Download for Mac (Intel)](https://sarakay.me/get/chiikawa-pet/mac-intel)** · [all formats & checksums](https://sarakay.me/downloads.html#chiikawa-pet)
+
 **A Chiikawa desktop pet that runs natively on Mac.** If you searched for *"chiikawa desktop pet macOS"* and only found Windows downloads — this is the Mac version. No Windows, no emulator, no Wine: a real macOS app for Apple Silicon (M1/M2/M3/M4) and Intel Macs.
 
 ちいかわのデスクトップペット、Mac版です 🐰 (macOS ネイティブアプリ・Apple Silicon対応)
